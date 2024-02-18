@@ -184,10 +184,11 @@ class PostController extends Controller
         $arrData = [];
         $topic = Topic::select('id', 'name_topic')->get();
 
-        $get = Post::select('posts.*','posts.id as id','history_activity_posts.is_seen', 'history_activity_posts.is_like', 'history_activity_posts.is_save_bookmark', 'users.username')
+        $get = Post::select('posts.*','posts.id as id', 'users.username')
         ->leftjoin('users', 'users.id', 'posts.user_id')
-        ->leftjoin('history_activity_posts', 'history_activity_posts.post_id', 'posts.id')
-        ->where('history_activity_posts.user_id',$request->user_id)->limit(20)->get();
+        // ->leftjoin('history_activity_posts', 'history_activity_posts.post_id', 'posts.id')
+        // ->where('history_activity_posts.user_id',$request->user_id)
+        ->limit(20)->get();
 
         foreach ($get as $key => $value) {
             $arrTopic = explode(',', $value->topic_id);
