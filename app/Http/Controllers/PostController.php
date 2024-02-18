@@ -46,7 +46,8 @@ class PostController extends Controller
 
         if ($insert) {
             return response()->json([
-                'status' => true
+                'status' => true,
+                'post_id' => $insert->id
             ], 200);
         } else {
             return response()->json([
