@@ -462,10 +462,11 @@ class PostController extends Controller
         $arrData = [];
         $topic = Topic::select('id', 'name_topic')->get();
 
-        $get = Post::select('posts.*')
+        $get = Post::select('posts.*', 'posts.id as id', 'users.username')
             ->whereNot('posts.user_id', $userLogin)
             ->where('history_activity_posts.user_id', $userLogin)
             ->where('history_activity_posts.is_save_bookmark', '1')
+            ->leftjoin('users', 'users.id', 'posts.user_id')
             ->leftjoin('history_activity_posts', 'history_activity_posts.post_id', 'posts.id')
             ->get();
 
@@ -506,10 +507,11 @@ class PostController extends Controller
         $arrData = [];
         $topic = Topic::select('id', 'name_topic')->get();
 
-        $get = Post::select('posts.*')
+        $get = Post::select('posts.*', 'posts.id as id', 'users.username')
             ->whereNot('posts.user_id', $userLogin)
             ->where('history_activity_posts.user_id', $userLogin)
             ->where('history_activity_posts.is_like', '1')
+            ->leftjoin('users', 'users.id', 'posts.user_id')
             ->leftjoin('history_activity_posts', 'history_activity_posts.post_id', 'posts.id')
             ->get();
 
