@@ -17,10 +17,10 @@ class LoginController extends Controller
          //get credentials from request
          $credentials = $request->only('email', 'password');
 
-         $get_user = User::where('email', $request->email)->get();
+         $get_user = User::where('email', $request->email)->orWhere('username', $request->email)->get();
          
          if(count($get_user) > 0) {
-            if(Auth::attempt($credentials)){
+            if(Auth::attempt($credentials) || Auth::attempt(['username' => $request->email, 'password' => $request->password])){
                 //if auth success
                 return response()->json([
                     'success' => true,
