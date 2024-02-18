@@ -38,6 +38,8 @@ Route::get('post-like', [PostController::class, 'toggleLike']);
 Route::get('post-bookmark', [PostController::class, 'toggleBookmark']);
 Route::get('suggest-post', [PostController::class, 'suggestedPost']);
 
+Route::get('get-data-user', [UserController::class, 'getProfile']);
+Route::post('edit-process-user', [UserController::class, 'editProfileProcess']);
 
 Route::get('test', function () {
     echo "Hello world";
