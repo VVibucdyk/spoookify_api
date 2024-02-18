@@ -86,7 +86,8 @@ class PostController extends Controller
         $data = Post::select('posts.*','posts.id as id','history_activity_posts.is_seen', 'history_activity_posts.is_like', 'history_activity_posts.is_save_bookmark', 'users.username')
         ->leftjoin('users', 'users.id', 'posts.user_id')
         ->leftjoin('history_activity_posts', 'history_activity_posts.post_id', 'posts.id')
-        ->where('posts.id',$request->id_post)->first();
+        ->where('posts.id',$request->id_post)
+        ->where('history_activity_posts.user_id',$request->user_id)->first();
         if($data !== null) {
             $arrTopic = explode(',', $data->topic_id);
             $arrTopicStore = [];
@@ -125,23 +126,68 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-        //
+        $post = Post::where('id', $request->post_id)->first();
+        if($post !== null) {
+            if($post->thumbnail_path !== $request->img) {
+                $filename = time().'-'.$request->arrUser. '.' . $request->img->extension();
+                $request->img->move(public_path('img/post'), $filename);
+            }else{
+                $filename = $request->img;
+            }
+
+            $update = Post::where('id', $request->post_id)->update([
+                'topic_id' => $request->topics,
+                'title_post' => $request->title,
+                'thumbnail_path' => $filename,
+                'content' => $request->text,
+            ]);
+
+            if($update) {
+                return response()->json([
+                'status' => true
+                ], 200);
+            }else{
+                return response()->json([
+                'status' => false
+                ], 200);
+            }
+        }else{
+            return response()->json([
+            'status' => false,
+            'message' => 'Post ini tidak terdaftar pada database!'
+            ], 200);
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Post $post)
+    public function destroy(Post $post, Request $request)
     {
-        //
+        // delete activity post
+        $delete_post = Post::where('id', $request->post_id)->delete();
+        if($delete_post) {
+            $delete_activity = DB::table('history_activity_posts')->where('post_id', $request->post_id)->delete();
+            return response()->json([
+                'status' => true,
+                'message' => "Berhasil Hapus!"
+            ], 200);
+        }else{
+            return response()->json([
+                'status' => true,
+                'message' => "Gagal Hapus! Hubungi Admin"
+            ], 200);
+        }
     }
 
-    public function newestPost(){
+    public function newestPost(Request $request){
         $arrData = [];
         $topic = Topic::select('id', 'name_topic')->get();
-        $get = Post::select('posts.*', 'users.username')
-        ->join('users', 'users.id', 'posts.user_id')
-        ->orderBy('posts.created_at', 'desc')->limit(5)->get();
+
+        $get = Post::select('posts.*','posts.id as id','history_activity_posts.is_seen', 'history_activity_posts.is_like', 'history_activity_posts.is_save_bookmark', 'users.username')
+        ->leftjoin('users', 'users.id', 'posts.user_id')
+        ->leftjoin('history_activity_posts', 'history_activity_posts.post_id', 'posts.id')
+        ->where('history_activity_posts.user_id',$request->user_id)->limit(20)->get();
 
         foreach ($get as $key => $value) {
             $arrTopic = explode(',', $value->topic_id);
@@ -272,5 +318,14 @@ class PostController extends Controller
                 'status' => false
             ], 200);
         }
+    }
+
+    public function getEditPost(Request $request) {
+        $topics = Topic::get();
+        $data = Post::where('id', $request->post_id)->first();
+        return response()->json([
+            'topics' => $topics,
+            'data' => $data
+        ], 200);
     }
 }

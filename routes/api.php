@@ -29,8 +29,10 @@ Route::post('set-topic-user', [UserController::class, 'setTopicUser']);
 Route::get('get-all-topics', [TopicController::class, 'index']);
 
 Route::post('create-post', [PostController::class, 'store']);
-
+Route::post('edit-post-process', [PostController::class, 'update']);
 Route::get('newest-post', [PostController::class, 'newestPost']);
+Route::get('edit-story', [PostController::class, 'getEditPost']);
+Route::get('delete-post', [PostController::class, 'destroy']);
 Route::get('see-post', [PostController::class, 'show']);
 Route::get('post-like', [PostController::class, 'toggleLike']);
 Route::get('post-bookmark', [PostController::class, 'toggleBookmark']);
