@@ -454,12 +454,20 @@ class PostController extends Controller
 
     public function proBookmarkPost(Request $request)
     {
+        //Mengambil informasi id user login
+        $userLoginArray = Post::where('user_id', $request->user_id)->first();
+        $userLoginArrayJson = json_decode($userLoginArray, true);
+        $userLogin = $userLoginArrayJson['user_id'];
+
         $arrData = [];
         $topic = Topic::select('id', 'name_topic')->get();
 
-        $get = Post::select('posts.*', 'posts.id as id', 'users.username')
-            ->leftjoin('users', 'users.id', 'posts.user_id')
-            ->inRandomOrder()->limit(20)->get();
+        $get = Post::select('posts.*')
+            ->whereNot('posts.user_id', $userLogin)
+            ->where('history_activity_posts.user_id', $userLogin)
+            ->where('history_activity_posts.is_save_bookmark', '1')
+            ->leftjoin('history_activity_posts', 'history_activity_posts.post_id', 'posts.id')
+            ->get();
 
         foreach ($get as $key => $value) {
             $arrTopic = explode(',', $value->topic_id);
@@ -490,12 +498,20 @@ class PostController extends Controller
 
     public function proLikePost(Request $request)
     {
+        //Mengambil informasi id user login
+        $userLoginArray = Post::where('user_id', $request->user_id)->first();
+        $userLoginArrayJson = json_decode($userLoginArray, true);
+        $userLogin = $userLoginArrayJson['user_id'];
+
         $arrData = [];
         $topic = Topic::select('id', 'name_topic')->get();
 
-        $get = Post::select('posts.*', 'posts.id as id', 'users.username')
-            ->leftjoin('users', 'users.id', 'posts.user_id')
-            ->inRandomOrder()->limit(20)->get();
+        $get = Post::select('posts.*')
+            ->whereNot('posts.user_id', $userLogin)
+            ->where('history_activity_posts.user_id', $userLogin)
+            ->where('history_activity_posts.is_like', '1')
+            ->leftjoin('history_activity_posts', 'history_activity_posts.post_id', 'posts.id')
+            ->get();
 
         foreach ($get as $key => $value) {
             $arrTopic = explode(',', $value->topic_id);
