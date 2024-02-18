@@ -541,4 +541,41 @@ class PostController extends Controller
             ], 200);
         }
     }
+
+    public function countRow(Request $request)
+    {
+        //Mengambil informasi id user login
+        $userLoginArray = Post::where('user_id', $request->user_id)->first();
+        $userLoginArrayJson = json_decode($userLoginArray, true);
+        $userLogin = $userLoginArrayJson['user_id'];
+
+        $getStories = Post::select('posts.*')
+            ->where('posts.user_id', $userLogin)
+            ->count();
+        $getBookmars = Post::select('posts.*')
+            ->where('posts.user_id', $userLogin)
+            ->whereNot('history_activity_posts.user_id', $userLogin)
+            ->where('history_activity_posts.is_save_bookmark', '1')
+            ->leftjoin('history_activity_posts', 'history_activity_posts.post_id', 'posts.id')
+            ->count();
+        $getLike = Post::select('posts.*')
+            ->where('posts.user_id', $userLogin)
+            ->whereNot('history_activity_posts.user_id', $userLogin)
+            ->where('history_activity_posts.is_like', '1')
+            ->leftjoin('history_activity_posts', 'history_activity_posts.post_id', 'posts.id')
+            ->count();
+
+        if ($userLogin) {
+            return response()->json([
+                'status' => true,
+                'dataStories' => $getStories,
+                'dataBookmark' => $getBookmars,
+                'dataLike' => $getLike
+            ], 200);
+        } else {
+            return response()->json([
+                'status' => false,
+            ], 200);
+        }
+    }
 }
