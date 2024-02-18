@@ -28,11 +28,11 @@ class LoginController extends Controller
                     'message' => "Berhasil Login!"
                 ], 200);
             }
+
             return response()->json([
                 'success' => false,
                 'message' => 'Email atau Password Anda salah'
-            ], 401);
-
+            ], 200);
             
         }else{
             return response()->json([
