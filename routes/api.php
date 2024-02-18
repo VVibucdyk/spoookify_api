@@ -38,6 +38,9 @@ Route::get('post-like', [PostController::class, 'toggleLike']);
 Route::get('post-bookmark', [PostController::class, 'toggleBookmark']);
 Route::get('suggest-post', [PostController::class, 'suggestedPost']);
 Route::get('search-post', [PostController::class, 'searchPost']);
+Route::get('pro-create-post', [PostController::class, 'proCreatePost']);
+Route::get('pro-bookmark-post', [PostController::class, 'proBookmarkPost']);
+Route::get('pro-like-post', [PostController::class, 'proLikePost']);
 
 Route::get('get-data-user', [UserController::class, 'getProfile']);
 Route::post('edit-process-user', [UserController::class, 'editProfileProcess']);
