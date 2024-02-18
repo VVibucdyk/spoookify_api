@@ -190,7 +190,7 @@ class PostController extends Controller
             ->leftjoin('users', 'users.id', 'posts.user_id')
             // ->leftjoin('history_activity_posts', 'history_activity_posts.post_id', 'posts.id')
             // ->where('history_activity_posts.user_id',$request->user_id)
-            ->limit(20)->get();
+            ->limit(100)->get();
 
         foreach ($get as $key => $value) {
             $arrTopic = explode(',', $value->topic_id);
@@ -343,6 +343,44 @@ class PostController extends Controller
         $get = Post::select('posts.*', 'posts.id as id', 'users.username')
             ->leftjoin('users', 'users.id', 'posts.user_id')
             ->inRandomOrder()->limit(20)->get();
+
+        foreach ($get as $key => $value) {
+            $arrTopic = explode(',', $value->topic_id);
+
+            $arrTopicStore = [];
+            foreach ($arrTopic as $key1 => $value1) {
+                foreach ($topic as $key2 => $value2) {
+                    if ($value2->id == $value1) {
+                        $arrTopicStore[] = $value2->name_topic;
+                    }
+                }
+            }
+            $arrData[$key] = $value;
+            $arrData[$key]->arr_name_topic = $arrTopicStore;
+        }
+
+        if ($get) {
+            return response()->json([
+                'status' => true,
+                'data' => $arrData
+            ], 200);
+        } else {
+            return response()->json([
+                'status' => false,
+            ], 200);
+        }
+    }
+
+    function searchPost(Request $request){
+        $arrData = [];
+        $topic = Topic::select('id', 'name_topic')->get();
+
+        $get = Post::select('posts.*', 'posts.id as id', 'users.username')
+            ->where('title_post', 'like', '%'.$request->keyword.'%')
+            ->leftjoin('users', 'users.id', 'posts.user_id')
+            // ->leftjoin('history_activity_posts', 'history_activity_posts.post_id', 'posts.id')
+            // ->where('history_activity_posts.user_id',$request->user_id)
+            ->limit(20)->get();
 
         foreach ($get as $key => $value) {
             $arrTopic = explode(',', $value->topic_id);

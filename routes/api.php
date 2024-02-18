@@ -37,6 +37,7 @@ Route::get('see-post', [PostController::class, 'show']);
 Route::get('post-like', [PostController::class, 'toggleLike']);
 Route::get('post-bookmark', [PostController::class, 'toggleBookmark']);
 Route::get('suggest-post', [PostController::class, 'suggestedPost']);
+Route::get('search-post', [PostController::class, 'searchPost']);
 
 Route::get('get-data-user', [UserController::class, 'getProfile']);
 Route::post('edit-process-user', [UserController::class, 'editProfileProcess']);
