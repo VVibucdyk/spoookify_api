@@ -42,6 +42,7 @@ Route::get('pro-create-post', [PostController::class, 'proCreatePost']);
 Route::get('pro-bookmark-post', [PostController::class, 'proBookmarkPost']);
 Route::get('pro-like-post', [PostController::class, 'proLikePost']);
 Route::get('count-row', [PostController::class, 'countRow']);
+Route::get('banner-post', [PostController::class, 'bannerPost']);
 
 Route::get('get-data-user', [UserController::class, 'getProfile']);
 Route::post('edit-process-user', [UserController::class, 'editProfileProcess']);

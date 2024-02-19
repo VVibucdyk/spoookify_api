@@ -376,7 +376,7 @@ class PostController extends Controller
         $arrData = [];
         $topic = Topic::select('id', 'name_topic')->get();
 
-        $get = Post::select('posts.*', 'posts.id as id', 'users.username','users.profile_path')
+        $get = Post::select('posts.*', 'posts.id as id', 'users.username', 'users.profile_path')
             ->where('title_post', 'like', '%' . $request->keyword . '%')
             ->leftjoin('users', 'users.id', 'posts.user_id')
             // ->leftjoin('history_activity_posts', 'history_activity_posts.post_id', 'posts.id')
@@ -571,6 +571,43 @@ class PostController extends Controller
                 'dataStories' => $getStories,
                 'dataBookmark' => $getBookmars,
                 'dataLike' => $getLike
+            ], 200);
+        } else {
+            return response()->json([
+                'status' => false,
+            ], 200);
+        }
+    }
+
+    public function bannerPost(Request $request)
+    {
+        $arrData = [];
+        $topic = Topic::select('id', 'name_topic')->get();
+
+        $get = Post::select('posts.id', 'posts.thumbnail_path', DB::raw('COUNT(CASE WHEN history_activity_posts.is_like = 1 THEN 1 ELSE NULL END) AS like_count'))
+            ->leftJoin('history_activity_posts', 'posts.id', '=', 'history_activity_posts.post_id')
+            ->groupBy('posts.id', 'posts.thumbnail_path')
+            ->get();
+
+        foreach ($get as $key => $value) {
+            $arrTopic = explode(',', $value->topic_id);
+
+            $arrTopicStore = [];
+            foreach ($arrTopic as $key1 => $value1) {
+                foreach ($topic as $key2 => $value2) {
+                    if ($value2->id == $value1) {
+                        $arrTopicStore[] = $value2->name_topic;
+                    }
+                }
+            }
+            $arrData[$key] = $value;
+            $arrData[$key]->arr_name_topic = $arrTopicStore;
+        }
+
+        if ($get) {
+            return response()->json([
+                'status' => true,
+                'data' => $arrData
             ], 200);
         } else {
             return response()->json([
