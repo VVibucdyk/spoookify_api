@@ -84,7 +84,7 @@ class PostController extends Controller
         $save_bookmark = DB::table('history_activity_posts')->where('is_save_bookmark', true)->where('post_id', $request->id_post)->count();
 
         $topic = Topic::select('id', 'name_topic')->get();
-        $data = Post::select('posts.*', 'posts.id as id', 'history_activity_posts.is_seen', 'history_activity_posts.is_like', 'history_activity_posts.is_save_bookmark', 'users.username')
+        $data = Post::select('posts.*', 'posts.id as id', 'history_activity_posts.is_seen', 'history_activity_posts.is_like', 'history_activity_posts.is_save_bookmark', 'users.username', 'users.profile_path')
             ->leftjoin('users', 'users.id', 'posts.user_id')
             ->leftjoin('history_activity_posts', 'history_activity_posts.post_id', 'posts.id')
             ->where('posts.id', $request->id_post)
@@ -186,7 +186,7 @@ class PostController extends Controller
         $arrData = [];
         $topic = Topic::select('id', 'name_topic')->get();
 
-        $get = Post::select('posts.*', 'posts.id as id', 'users.username')
+        $get = Post::select('posts.*', 'posts.id as id', 'users.username', 'users.profile_path')
             ->leftjoin('users', 'users.id', 'posts.user_id')
             // ->leftjoin('history_activity_posts', 'history_activity_posts.post_id', 'posts.id')
             // ->where('history_activity_posts.user_id',$request->user_id)
@@ -340,7 +340,7 @@ class PostController extends Controller
         $arrData = [];
         $topic = Topic::select('id', 'name_topic')->get();
 
-        $get = Post::select('posts.*', 'posts.id as id', 'users.username')
+        $get = Post::select('posts.*', 'posts.id as id', 'users.username', 'users.profile_path')
             ->leftjoin('users', 'users.id', 'posts.user_id')
             ->inRandomOrder()->limit(20)->get();
 
@@ -376,7 +376,7 @@ class PostController extends Controller
         $arrData = [];
         $topic = Topic::select('id', 'name_topic')->get();
 
-        $get = Post::select('posts.*', 'posts.id as id', 'users.username')
+        $get = Post::select('posts.*', 'posts.id as id', 'users.username','users.profile_path')
             ->where('title_post', 'like', '%' . $request->keyword . '%')
             ->leftjoin('users', 'users.id', 'posts.user_id')
             // ->leftjoin('history_activity_posts', 'history_activity_posts.post_id', 'posts.id')
@@ -420,7 +420,7 @@ class PostController extends Controller
         $arrData = [];
         $topic = Topic::select('id', 'name_topic')->get();
 
-        $get = Post::select('posts.*', 'posts.id as id', 'users.username')
+        $get = Post::select('posts.*', 'posts.id as id', 'users.username', 'users.profile_path')
             ->where('user_id', $userLogin)
             ->leftjoin('users', 'users.id', 'posts.user_id')
             ->orderBy('id', 'desc')->get();
@@ -462,7 +462,7 @@ class PostController extends Controller
         $arrData = [];
         $topic = Topic::select('id', 'name_topic')->get();
 
-        $get = Post::select('posts.*', 'posts.id as id', 'users.username')
+        $get = Post::select('posts.*', 'posts.id as id', 'users.username', 'users.profile_path')
             ->whereNot('posts.user_id', $userLogin)
             ->where('history_activity_posts.user_id', $userLogin)
             ->where('history_activity_posts.is_save_bookmark', '1')
@@ -507,7 +507,7 @@ class PostController extends Controller
         $arrData = [];
         $topic = Topic::select('id', 'name_topic')->get();
 
-        $get = Post::select('posts.*', 'posts.id as id', 'users.username')
+        $get = Post::select('posts.*', 'posts.id as id', 'users.username', 'users.profile_path')
             ->whereNot('posts.user_id', $userLogin)
             ->where('history_activity_posts.user_id', $userLogin)
             ->where('history_activity_posts.is_like', '1')
