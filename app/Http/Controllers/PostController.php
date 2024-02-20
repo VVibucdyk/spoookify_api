@@ -188,13 +188,14 @@ class PostController extends Controller
 
         $get = Post::select('posts.*', 'posts.id as id', 'users.username', 'users.profile_path')
             ->leftjoin('users', 'users.id', 'posts.user_id')
-            // ->leftjoin('history_activity_posts', 'history_activity_posts.post_id', 'posts.id')
             // ->where('history_activity_posts.user_id',$request->user_id)
+            // ->distinct()
+            ->orderBy('created_at', 'desc')
             ->limit(100)->get();
 
+        $activity_post = DB::table('history_activity_posts')->where('user_id', $request->user_id)->get();
         foreach ($get as $key => $value) {
             $arrTopic = explode(',', $value->topic_id);
-
             $arrTopicStore = [];
             foreach ($arrTopic as $key1 => $value1) {
                 foreach ($topic as $key2 => $value2) {
@@ -205,6 +206,13 @@ class PostController extends Controller
             }
             $arrData[$key] = $value;
             $arrData[$key]->arr_name_topic = $arrTopicStore;
+
+
+            foreach ($activity_post as $key1 => $value1) {
+                if($value1->post_id == $value->id) {
+                    $arrData[$key]->is_save_bookmark = $value1->is_save_bookmark;
+                }
+            }
         }
 
         if ($get) {
@@ -287,6 +295,7 @@ class PostController extends Controller
                     'user_id' => $request->user_id
                 ]);
 
+            
             if ($create) {
                 return response()->json([
                     'status' => true
@@ -343,7 +352,7 @@ class PostController extends Controller
         $get = Post::select('posts.*', 'posts.id as id', 'users.username', 'users.profile_path')
             ->leftjoin('users', 'users.id', 'posts.user_id')
             ->inRandomOrder()->limit(20)->get();
-
+        $activity_post = DB::table('history_activity_posts')->where('user_id', $request->user_id)->get();
         foreach ($get as $key => $value) {
             $arrTopic = explode(',', $value->topic_id);
 
@@ -357,6 +366,12 @@ class PostController extends Controller
             }
             $arrData[$key] = $value;
             $arrData[$key]->arr_name_topic = $arrTopicStore;
+
+            foreach ($activity_post as $key1 => $value1) {
+                if($value1->post_id == $value->id) {
+                    $arrData[$key]->is_save_bookmark = $value1->is_save_bookmark;
+                }
+            }
         }
 
         if ($get) {
@@ -382,7 +397,7 @@ class PostController extends Controller
             // ->leftjoin('history_activity_posts', 'history_activity_posts.post_id', 'posts.id')
             // ->where('history_activity_posts.user_id',$request->user_id)
             ->limit(20)->get();
-
+        $activity_post = DB::table('history_activity_posts')->where('user_id', $request->user_id)->get();
         foreach ($get as $key => $value) {
             $arrTopic = explode(',', $value->topic_id);
 
@@ -396,6 +411,12 @@ class PostController extends Controller
             }
             $arrData[$key] = $value;
             $arrData[$key]->arr_name_topic = $arrTopicStore;
+
+            foreach ($activity_post as $key1 => $value1) {
+                if($value1->post_id == $value->id) {
+                    $arrData[$key]->is_save_bookmark = $value1->is_save_bookmark;
+                }
+            }
         }
 
         if ($get) {
@@ -413,9 +434,7 @@ class PostController extends Controller
     public function proCreatePost(Request $request)
     {
         //Mengambil informasi id user login
-        $userLoginArray = Post::where('user_id', $request->user_id)->first();
-        $userLoginArrayJson = json_decode($userLoginArray, true);
-        $userLogin = $userLoginArrayJson['user_id'];
+        $userLogin = $request->user_id;
 
         $arrData = [];
         $topic = Topic::select('id', 'name_topic')->get();
@@ -455,9 +474,7 @@ class PostController extends Controller
     public function proBookmarkPost(Request $request)
     {
         //Mengambil informasi id user login
-        $userLoginArray = Post::where('user_id', $request->user_id)->first();
-        $userLoginArrayJson = json_decode($userLoginArray, true);
-        $userLogin = $userLoginArrayJson['user_id'];
+        $userLogin = $request->user_id;
 
         $arrData = [];
         $topic = Topic::select('id', 'name_topic')->get();
@@ -469,6 +486,7 @@ class PostController extends Controller
             ->leftjoin('users', 'users.id', 'posts.user_id')
             ->leftjoin('history_activity_posts', 'history_activity_posts.post_id', 'posts.id')
             ->get();
+        $activity_post = DB::table('history_activity_posts')->where('user_id', $request->user_id)->get();
 
         foreach ($get as $key => $value) {
             $arrTopic = explode(',', $value->topic_id);
@@ -483,6 +501,12 @@ class PostController extends Controller
             }
             $arrData[$key] = $value;
             $arrData[$key]->arr_name_topic = $arrTopicStore;
+
+            foreach ($activity_post as $key1 => $value1) {
+                if($value1->post_id == $value->id) {
+                    $arrData[$key]->is_save_bookmark = $value1->is_save_bookmark;
+                }
+            }
         }
 
         if ($get) {
@@ -500,9 +524,7 @@ class PostController extends Controller
     public function proLikePost(Request $request)
     {
         //Mengambil informasi id user login
-        $userLoginArray = Post::where('user_id', $request->user_id)->first();
-        $userLoginArrayJson = json_decode($userLoginArray, true);
-        $userLogin = $userLoginArrayJson['user_id'];
+        $userLogin = $request->user_id;
 
         $arrData = [];
         $topic = Topic::select('id', 'name_topic')->get();
@@ -514,7 +536,7 @@ class PostController extends Controller
             ->leftjoin('users', 'users.id', 'posts.user_id')
             ->leftjoin('history_activity_posts', 'history_activity_posts.post_id', 'posts.id')
             ->get();
-
+        $activity_post = DB::table('history_activity_posts')->where('user_id', $request->user_id)->get();
         foreach ($get as $key => $value) {
             $arrTopic = explode(',', $value->topic_id);
 
@@ -528,6 +550,12 @@ class PostController extends Controller
             }
             $arrData[$key] = $value;
             $arrData[$key]->arr_name_topic = $arrTopicStore;
+
+            foreach ($activity_post as $key1 => $value1) {
+                if($value1->post_id == $value->id) {
+                    $arrData[$key]->is_save_bookmark = $value1->is_save_bookmark;
+                }
+            }
         }
 
         if ($get) {
@@ -544,10 +572,7 @@ class PostController extends Controller
 
     public function countRow(Request $request)
     {
-        //Mengambil informasi id user login
-        $userLoginArray = Post::where('user_id', $request->user_id)->first();
-        $userLoginArrayJson = json_decode($userLoginArray, true);
-        $userLogin = $userLoginArrayJson['user_id'];
+        $userLogin = $request->user_id;
 
         $getStories = Post::select('posts.*')
             ->where('posts.user_id', $userLogin)
@@ -586,28 +611,15 @@ class PostController extends Controller
 
         $get = Post::select('posts.id', 'posts.thumbnail_path', DB::raw('COUNT(CASE WHEN history_activity_posts.is_like = 1 THEN 1 ELSE NULL END) AS like_count'))
             ->leftJoin('history_activity_posts', 'posts.id', '=', 'history_activity_posts.post_id')
+            ->orderBy('like_count', 'desc')
             ->groupBy('posts.id', 'posts.thumbnail_path')
+            ->limit('5')
             ->get();
-
-        foreach ($get as $key => $value) {
-            $arrTopic = explode(',', $value->topic_id);
-
-            $arrTopicStore = [];
-            foreach ($arrTopic as $key1 => $value1) {
-                foreach ($topic as $key2 => $value2) {
-                    if ($value2->id == $value1) {
-                        $arrTopicStore[] = $value2->name_topic;
-                    }
-                }
-            }
-            $arrData[$key] = $value;
-            $arrData[$key]->arr_name_topic = $arrTopicStore;
-        }
 
         if ($get) {
             return response()->json([
                 'status' => true,
-                'data' => $arrData
+                'data' => $get
             ], 200);
         } else {
             return response()->json([
